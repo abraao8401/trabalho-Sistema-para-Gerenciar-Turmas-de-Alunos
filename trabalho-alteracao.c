@@ -32,6 +32,7 @@
         
         
         printf("\n\tDigite o nome do aluno ou \"menu\" para retornar ao menu:\n\t");
+        getchar();
         fgets(nome, 100, stdin);
         
          strcpy(aux, nome); 
@@ -167,6 +168,18 @@
         
     }
     
+    int estanoArquivo(Aluno *alunos, unsigned int mat, int *indice){
+        int i;
+         for(i=0;i<30; i++){ //DUVIDA TAMANHO DO VETOR
+                if(mat == alunos[i].matricula){
+                    *indice = i; 
+                    return 1;
+                }
+            }
+            
+            return 0;
+    }
+    
     
 
 int main()
@@ -226,6 +239,7 @@ int main()
        double aux = 0.0;
         
         printf("\n\tDigite o nome do aquivo para a turma a ser cadastrada: \n\t"); 
+        getchar();
         scanf("%[^\n]", nomearq);
         
         arquivo = fopen(nomearq, "wb"); //DUVIDA COMO CONCILIAR CAMINHO E NOME PARA ABRIR UM ARQUIVO
@@ -301,6 +315,7 @@ int main()
             scanf("%u", &alunos[i].matricula);
         }
         rewind(arquivo);
+        free(alunos);
         fclose(arquivo);
     }
     
@@ -310,7 +325,7 @@ int main()
         char aux[60];
         int i;
         printf("\n\tDigite o nome de um arquivo de turma ou \"fim\" para encerrar\n\t"); //DUVIDA COMO VERIFICAR SE O NOME DO ARQUIVO É VALIDO
-        scanf("%s",nomearq);
+        scanf(" %s",nomearq);
         getchar();
         strcpy(aux, nomearq);
         for(i=0; aux[i] != '\0'; i++){
@@ -348,5 +363,62 @@ int main()
         }
         
     }
-    void alteracaoDadosAluno(){}
+    void alteracaoDadosAluno(){
+        FILE *arquivo;
+        Aluno *alunos;
+        char nomearq[60];
+        char aux[60];
+        unsigned int mat;
+        int  indiceAluno; 
+        int i=0, j=0;
+        printf("\n\tDigite o nome de um arquivo de turma ou \"fim\" para encerrar\n\t"); //DUVIDA COMO VERIFICAR SE O NOME DO ARQUIVO É VALIDO
+        scanf("%s",nomearq); //DUVIDA CRIAR UMA LISTA DE NOMES DE ARQUIVOS EXISTENTES
+        getchar();
+        strcpy(aux, nomearq);
+        for(i=0; aux[i] != '\0'; i++){
+            if(isalpha(aux[i]))  aux[i] = toupper(aux[i]);
+        }
+        if(strcmp(aux, "FIM") ==0){
+            menu();
+        }
+        
+        arquivo = fopen(nomearq, "wb");
+        if(!arquivo){
+            printf("Erro!"); 
+            exit(1);
+        }
+        
+        alunos = (Aluno*) malloc(30 * sizeof(Aluno));
+        if(!alunos){
+            printf("Erro!"); 
+            exit(1); 
+        }
+         for(i=0; i<30; i++){
+               fread(&alunos[i], sizeof(Aluno), 1, arquivo); }
+               
+        printf("\n\tDigite um numero de matricula válido ou 0 para encerrar\n\t");
+            do{scanf("%u", &mat);
+            if(!estanoArquivo(alunos, mat, &indiceAluno)){
+                printf("\n\tO registro não se encontra no arquivo, tente novamente\n\t");
+            }
+            }while(estanoArquivo(alunos, mat, &indiceAluno) ==0 || mat != 0);
+             if(mat==0){
+                 system("clear");
+                 menu();   
+                }
+     
+                printf("\n\tNOME: %s",alunos[indiceAluno].nome); 
+                printf("\n\tMatricula: %u",alunos[indiceAluno].matricula); 
+                printf("\n\tCPF: %s",alunos[i].CPF); 
+                   for(j=0; j<5; j++){
+                       printf("\n\tProva %d: %.2lf", j+1, alunos[indiceAluno].notas[j]);
+                   }
+                printf("\n\tNota Final: %.2lf", alunos[indiceAluno].notaFinal);
+                printf("\n\tNúmero de ausências: %u", alunos[indiceAluno].numAusencias);
+                printf("\n\tSituação: %s\n", alunos[indiceAluno].situacao);
+             
+           
+           
+        }
+        
     void listagemDadosTurma(){}
